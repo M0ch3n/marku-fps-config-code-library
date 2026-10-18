@@ -9,6 +9,7 @@
     importScope: "",
     reorderMode: false,
     i18nTranslating: false,
+    pendingLanguageRender: false,
     switchToken: 0,
     contentEnterTimer: null,
     resultsAnimationTimer: null,
@@ -17,11 +18,8 @@
     codesSignature: "",
     announcements: {
       items: [],
-      total: 0,
-      loading: false,
       stale: false,
       warning: "",
-      game: "",
       requestId: 0,
     },
     filters: {
@@ -33,14 +31,24 @@
   };
 
   const SETTINGS_KEY = "config-codex-settings";
+  const DRAG_SCROLL_EDGE = 96;
+  const DRAG_SCROLL_MIN_SPEED = 60;
+  const DRAG_SCROLL_MAX_SPEED = 360;
+  const DRAG_SCROLL_RAMP_MS = 350;
   const settings = {
     theme: "light",
     gameMode: "all",
     language: "zh-CN",
+    activeGame: "暗区突围",
   };
 
   let draggedRow = null;
   let draggedRecently = false;
+  let dragScrollFrame = null;
+  let dragPointerY = null;
+  let dragScrollDirection = 0;
+  let dragScrollStartedAt = 0;
+  let dragScrollLastFrameAt = 0;
   let tabIndicatorReady = false;
   let formTypeValue = "";
   const animatedSegmentIndicators = new WeakSet();
@@ -175,8 +183,38 @@
     return "";
   }
 
-  function getDeltaTypeForCode(code) {
-    return /BLAST6/i.test(String(code || "")) ? "配装码" : "改枪码";
+  function getItemLanguage(item) {
+    const code = String(item && item.code ? item.code : "");
+    if (item && item.game === "三角洲行动") {
+      if (
+        /-(?:Operations(?:\s*\(Extraction Mode\))?|Warfare|Detonation)-/i.test(
+          code
+        ) ||
+        /^BLAST6/i.test(code)
+      ) {
+        return "en";
+      }
+      if (/(?:烽火地带|全面战场|黑潮爆破)/.test(code)) {
+        return "zh-CN";
+      }
+    }
+    if (item && item.game === "暗区突围") {
+      if (/^(?:改枪|配装|游戏|控制|后处理)-/.test(code)) {
+        return "zh-CN";
+      }
+      if (/^(?:Equipment-|3f)/i.test(code)) {
+        return "en";
+      }
+    }
+    return /[\u3400-\u9fff]/.test(
+      String(item && item.weapon ? item.weapon : "")
+    )
+      ? "zh-CN"
+      : "en";
+  }
+
+  function isVisibleInCurrentLanguage(item) {
+    return settings.language !== "en" || getItemLanguage(item) === "en";
   }
 
   const DELTA_MODE_CLASS = {
@@ -286,7 +324,12 @@
   function setupI18nObserver() {
     const observer = new MutationObserver(() => {
       if (state.i18nTranslating) return;
-      window.requestAnimationFrame(() => translateDocument());
+      window.requestAnimationFrame(() => {
+        const activeDialog = [
+          ...document.querySelectorAll("dialog[open]"),
+        ].at(-1);
+        translateDocument(activeDialog || document.body);
+      });
     });
     observer.observe(document.body, {
       childList: true,
@@ -305,7 +348,8 @@
   }
 
   function displayPrice(price) {
-    return price ? `${price}W` : "";
+    if (!price) return "";
+    return settings.language === "en" ? String(price) : `${price}W`;
   }
 
   let toastTimer;
@@ -482,6 +526,22 @@
   });
 
   document.addEventListener(
+    "close",
+    (event) => {
+      if (
+        event.target.tagName !== "DIALOG" ||
+        !state.pendingLanguageRender ||
+        document.querySelector("dialog[open]")
+      ) {
+        return;
+      }
+      state.pendingLanguageRender = false;
+      applyLanguage({ animate: false });
+    },
+    true
+  );
+
+  document.addEventListener(
     "click",
     (event) => {
       const button = event.target.closest("[data-tooltip]");
@@ -502,9 +562,12 @@
       trMessage(message)
     )}</span>`;
     const tipWidth = actionTip.offsetWidth;
-    const left = Math.max(rect.left - 8, tipWidth + 8);
+    const left = Math.min(
+      Math.max(rect.left + rect.width / 2, tipWidth / 2 + 8),
+      window.innerWidth - tipWidth / 2 - 8
+    );
     actionTip.style.left = `${left}px`;
-    actionTip.style.top = `${rect.top + rect.height / 2}px`;
+    actionTip.style.top = `${rect.bottom}px`;
     actionTip.classList.add("show");
     clearTimeout(actionTipTimer);
     actionTipTimer = setTimeout(() => actionTip.classList.remove("show"), 1600);
@@ -563,6 +626,9 @@
       }
       if (["zh-CN", "en"].includes(saved.language)) {
         settings.language = saved.language;
+      }
+      if (["暗区突围", "三角洲行动"].includes(saved.activeGame)) {
+        settings.activeGame = saved.activeGame;
       }
     } catch {
       // Ignore invalid or unavailable storage.
@@ -755,27 +821,7 @@
     });
   }
 
-  function refreshDropdownLabels() {
-    [typeFilterDropdown, deltaModeDropdown, fieldTypeDropdown].forEach(
-      (dropdown) => {
-        const input = dropdown.querySelector(".dropdown-value");
-        setDropdownValue(dropdown, input.value);
-      }
-    );
-  }
-
-  function applyLanguage({ animate = true } = {}) {
-    document.documentElement.lang = settings.language;
-    setSettingControlLabels();
-    translateDocument(document.body);
-    setupSettingControlAnimations();
-    updateSettingsUI({ animate });
-    updateGameTabLabels();
-    updateCodeLabel();
-    updateDeltaFormFields();
-    updateReorderButton();
-    updateClearFilterButton();
-    const game = state.filters.game;
+  function updateGameChrome(game) {
     const isArena = game === "暗区突围";
     const label = gameLabel(game);
     gameTitle.textContent = label;
@@ -786,9 +832,45 @@
     typeFilterDropdown.hidden = !isArena;
     deltaModeDropdown.hidden = isArena;
     settingsCodeBtn.hidden = !isArena;
-    render();
+    return isArena;
+  }
+
+  function refreshDropdownLabels() {
+    [typeFilterDropdown, deltaModeDropdown, fieldTypeDropdown].forEach(
+      (dropdown) => {
+        const input = dropdown.querySelector(".dropdown-value");
+        setDropdownValue(dropdown, input.value);
+      }
+    );
+  }
+
+  function applyLanguage({ animate = true } = {}) {
+    const activeDialog = [
+      ...document.querySelectorAll("dialog[open]"),
+    ].at(-1);
+    document.documentElement.lang = settings.language;
+    setSettingControlLabels();
+    translateDocument(activeDialog || document.body);
+    setupSettingControlAnimations();
+    updateSettingsUI({ animate });
+    updateGameTabLabels();
+    updateCodeLabel();
+    updateDeltaFormFields();
+    updateReorderButton();
+    updateClearFilterButton();
+    const game = state.filters.game;
+    updateGameChrome(game);
+    window.requestAnimationFrame(() => {
+      updateTabIndicator({ animate: false });
+    });
+    if (activeDialog) {
+      state.pendingLanguageRender = true;
+    } else {
+      state.pendingLanguageRender = false;
+      render();
+    }
     refreshDropdownLabels();
-    translateDocument(document.body);
+    translateDocument(activeDialog || document.body);
     if (announcementsDialog.open) loadAnnouncements();
   }
 
@@ -843,6 +925,15 @@
       const dialog = dropdown.closest("dialog");
       if (dialog) dialog.classList.toggle("dropdown-open", isOpen);
       if (isOpen) {
+        let visibleIndex = 0;
+        options.forEach((option) => {
+          if (option.hidden) return;
+          option.style.setProperty(
+            "--dropdown-option-index",
+            String(visibleIndex)
+          );
+          visibleIndex += 1;
+        });
         document.querySelectorAll("[data-dropdown].is-open").forEach((other) => {
           if (other !== dropdown) closeDropdown(other);
         });
@@ -951,6 +1042,8 @@
     const shouldAnimate = animate && !reduceMotion;
 
     state.filters.game = game;
+    settings.activeGame = game;
+    saveSettings();
     gameTabs.querySelectorAll(".tab").forEach((tab) => {
       tab.classList.toggle("is-active", tab.dataset.game === game);
     });
@@ -972,16 +1065,7 @@
       if (state.switchToken !== token) return;
     }
 
-    const isArena = game === "暗区突围";
-    const label = gameLabel(game);
-    gameTitle.textContent = label;
-    gameLogo.src = isArena
-      ? "/assets/arena-breakout-icon.png?v=20261016-1"
-      : "/assets/delta-force-icon.png?v=20261016-1";
-    gameLogo.alt = label;
-    typeFilterDropdown.hidden = !isArena;
-    deltaModeDropdown.hidden = isArena;
-    settingsCodeBtn.hidden = !isArena;
+    const isArena = updateGameChrome(game);
     if (!isArena) {
       setDropdownValue(typeFilterDropdown, "");
       state.filters.type = "";
@@ -1097,6 +1181,7 @@
   function getFiltered() {
     const { game, type, mode, search } = state.filters;
     return state.codes.filter((item) => {
+      if (!isVisibleInCurrentLanguage(item)) return false;
       if (game && item.game !== game) return false;
       if (type && item.type !== type) return false;
       if (game === "三角洲行动" && mode && getDeltaMode(item) !== mode) {
@@ -1138,8 +1223,7 @@
     button.setAttribute("aria-expanded", String(shouldOpen));
   }
 
-  function rowHTML(item) {
-    const draggable = canReorder();
+  function itemBadges(item) {
     const price = displayPrice(item.price);
     const priceChip = price
       ? `<span class="price-chip">${escapeHtml(price)}</span>`
@@ -1157,6 +1241,12 @@
           deltaMode
         )}">${escapeHtml(deltaMode)}</span>`
       : "";
+    return { priceChip, typeBadge, modeBadge };
+  }
+
+  function rowHTML(item) {
+    const draggable = canReorder();
+    const { priceChip, typeBadge, modeBadge } = itemBadges(item);
     return `<article class="row" data-id="${escapeHtml(item.id)}" draggable="${draggable ? "true" : "false"}">
       ${
         draggable
@@ -1189,9 +1279,12 @@
     </article>`;
   }
 
-  function emptyHTML() {
+  function emptyHTML(languageHidden = false) {
     const hasFilter =
       state.filters.type || state.filters.mode || state.filters.search;
+    if (!hasFilter && languageHidden) {
+      return `<div class="empty"><strong>暂无英文配置码</strong>切换到中文模式可查看中文卡片</div>`;
+    }
     return `<div class="empty"><strong>${
       hasFilter ? "没有符合条件的配置" : "还没有配置"
     }</strong>${hasFilter ? "换个筛选条件试试" : "点击右上角「新增」开始添加"}</div>`;
@@ -1199,10 +1292,19 @@
 
   function render({ animateResults = false } = {}) {
     const items = getFiltered();
-    listEl.classList.toggle("is-reordering", state.reorderMode);
+    const languageHidden =
+      settings.language === "en" &&
+      state.codes.some(
+        (item) =>
+          item.game === state.filters.game &&
+          !isVisibleInCurrentLanguage(item)
+      );
     listEl.innerHTML = items.length
       ? items.map(rowHTML).join("")
-      : emptyHTML();
+      : emptyHTML(languageHidden);
+    window.requestAnimationFrame(() => {
+      listEl.classList.toggle("is-reordering", state.reorderMode);
+    });
     translateDocument(listEl);
 
     clearTimeout(state.resultsAnimationTimer);
@@ -1229,22 +1331,7 @@
   }
 
   function detailHTML(item) {
-    const price = displayPrice(item.price);
-    const priceChip = price
-      ? `<span class="price-chip">${escapeHtml(price)}</span>`
-      : "";
-    const typeBadge =
-      item.game === "暗区突围"
-        ? `<span class="badge ${TYPE_CLASS[item.type] || "badge-mod"}">${escapeHtml(
-            item.type
-          )}</span>`
-        : "";
-    const deltaMode = item.game === "三角洲行动" ? getDeltaMode(item) : "";
-    const modeBadge = deltaMode
-      ? `<span class="badge ${getDeltaModeClass(
-          deltaMode
-        )}">${escapeHtml(deltaMode)}</span>`
-      : "";
+    const { priceChip, typeBadge, modeBadge } = itemBadges(item);
 
     return `<div class="detail-head">
       <div class="detail-title-wrap">
@@ -1301,7 +1388,7 @@
   function updateDeltaFormFields() {
     if (state.formGame !== "三角洲行动") {
       priceField.hidden = false;
-      priceSuffix.hidden = false;
+      priceSuffix.hidden = settings.language === "en";
       fieldPrice.placeholder = fieldType.value ? t("例如：30") : "";
       weaponFieldLabel.textContent =
         fieldType.value === "配装码"
@@ -1327,7 +1414,7 @@
     const hasPriceUnit = mode === "烽火地带改枪码";
     const isBlackTideLoadout = mode === "黑潮爆破配装码";
     priceField.hidden = !hasPrice;
-    priceSuffix.hidden = !hasPriceUnit;
+    priceSuffix.hidden = !hasPriceUnit || settings.language === "en";
     fieldPrice.placeholder =
       !mode
         ? ""
@@ -1498,7 +1585,10 @@
   function buildGameQueryLines(game) {
     return state.codes
       .filter(
-        (item) => item.game === game && !SETTINGS_TYPES.includes(item.type)
+        (item) =>
+          item.game === game &&
+          isVisibleInCurrentLanguage(item) &&
+          !SETTINGS_TYPES.includes(item.type)
       )
       .map((item) => {
         if (game === "三角洲行动") {
@@ -2087,7 +2177,6 @@
   async function loadAnnouncements() {
     const game = state.filters.game;
     const requestId = ++state.announcements.requestId;
-    state.announcements.loading = true;
     announcementList.innerHTML = '<div class="empty">加载中...</div>';
 
     try {
@@ -2103,11 +2192,9 @@
           data.error || "无法连接公告服务器，请检查网络后重试"
         );
       }
-      state.announcements.total = data.total || 0;
       state.announcements.items = data.items || [];
       state.announcements.stale = Boolean(data.stale);
       state.announcements.warning = data.warning || "";
-      state.announcements.game = data.game || game;
       renderAnnouncements();
     } catch (err) {
       if (requestId !== state.announcements.requestId) return;
@@ -2116,10 +2203,6 @@
         ${escapeHtml(err.message)}
         <div class="announcement-hint">请检查网络，然后点击右上角刷新重试。</div>
       </div>`;
-    } finally {
-      if (requestId === state.announcements.requestId) {
-        state.announcements.loading = false;
-      }
     }
   }
 
@@ -2130,19 +2213,36 @@
 
   function updateReorderButton() {
     const filtersActive = hasActiveFilters();
+    const reorderBlockedLabel = t("请先完成排序");
     reorderBtn.disabled = filtersActive && !state.reorderMode;
+    announcementsBtn.disabled = state.reorderMode;
+    addBtn.disabled = state.reorderMode;
+    announcementsBtn.dataset.tooltip = state.reorderMode
+      ? reorderBlockedLabel
+      : t("查看最新公告");
+    announcementsBtn.setAttribute(
+      "aria-label",
+      state.reorderMode ? reorderBlockedLabel : t("查看最新公告")
+    );
+    addBtn.dataset.tooltip = state.reorderMode
+      ? reorderBlockedLabel
+      : t("新增");
+    addBtn.setAttribute(
+      "aria-label",
+      state.reorderMode ? reorderBlockedLabel : t("新增")
+    );
     if (state.reorderMode) {
       reorderBtn.innerHTML = ICONS.check;
-      reorderBtn.dataset.tooltip = "保存顺序";
-      reorderBtn.setAttribute("aria-label", "保存顺序");
+      reorderBtn.dataset.tooltip = t("保存顺序");
+      reorderBtn.setAttribute("aria-label", t("保存顺序"));
     } else if (filtersActive) {
       reorderBtn.innerHTML = ICONS.reorder;
-      reorderBtn.dataset.tooltip = "请先清空筛选";
-      reorderBtn.setAttribute("aria-label", "请先清空筛选");
+      reorderBtn.dataset.tooltip = t("请先清空筛选");
+      reorderBtn.setAttribute("aria-label", t("请先清空筛选"));
     } else {
       reorderBtn.innerHTML = ICONS.reorder;
-      reorderBtn.dataset.tooltip = "调整顺序";
-      reorderBtn.setAttribute("aria-label", "调整顺序");
+      reorderBtn.dataset.tooltip = t("调整顺序");
+      reorderBtn.setAttribute("aria-label", t("调整顺序"));
     }
   }
 
@@ -2391,12 +2491,100 @@
     const row = event.target.closest(".row");
     if (!row || !canReorder()) return;
     if (event.target.closest(".row-actions")) return;
+    stopDragAutoScroll();
     draggedRow = row;
     draggedRecently = true;
     row.classList.add("is-dragging");
     if (event.dataTransfer) {
       event.dataTransfer.effectAllowed = "move";
       event.dataTransfer.setData("text/plain", row.dataset.id || "");
+    }
+  });
+
+  function getDragScrollIntent(pointerY) {
+    const viewportHeight = window.innerHeight;
+    const toolbarBottom =
+      document.querySelector(".content-toolbar")?.getBoundingClientRect()
+        .bottom || 0;
+    const topEdge = toolbarBottom + DRAG_SCROLL_EDGE;
+    const bottomEdge = viewportHeight - DRAG_SCROLL_EDGE;
+
+    if (pointerY < topEdge && window.scrollY > 0) {
+      const depth = Math.min(
+        1,
+        (topEdge - pointerY) / DRAG_SCROLL_EDGE
+      );
+      return {
+        direction: -1,
+        speed:
+          DRAG_SCROLL_MIN_SPEED +
+          depth * (DRAG_SCROLL_MAX_SPEED - DRAG_SCROLL_MIN_SPEED),
+      };
+    }
+    if (
+      pointerY > bottomEdge &&
+      window.scrollY + viewportHeight <
+        document.documentElement.scrollHeight - 1
+    ) {
+      const depth = Math.min(
+        1,
+        (pointerY - bottomEdge) / DRAG_SCROLL_EDGE
+      );
+      return {
+        direction: 1,
+        speed:
+          DRAG_SCROLL_MIN_SPEED +
+          depth * (DRAG_SCROLL_MAX_SPEED - DRAG_SCROLL_MIN_SPEED),
+      };
+    }
+    return null;
+  }
+
+  function runDragAutoScroll(timestamp) {
+    dragScrollFrame = null;
+    if (!draggedRow || dragPointerY == null) return;
+    const intent = getDragScrollIntent(dragPointerY);
+    if (!intent) {
+      dragScrollDirection = 0;
+      dragScrollStartedAt = 0;
+      dragScrollLastFrameAt = 0;
+      dragScrollFrame = window.requestAnimationFrame(runDragAutoScroll);
+      return;
+    }
+    if (intent.direction !== dragScrollDirection) {
+      dragScrollDirection = intent.direction;
+      dragScrollStartedAt = timestamp;
+      dragScrollLastFrameAt = timestamp;
+    }
+    const elapsed = dragScrollLastFrameAt
+      ? Math.min(32, timestamp - dragScrollLastFrameAt)
+      : 0;
+    dragScrollLastFrameAt = timestamp;
+    const ramp = Math.min(
+      1,
+      (timestamp - dragScrollStartedAt) / DRAG_SCROLL_RAMP_MS
+    );
+    const delta = intent.speed * ramp * (elapsed / 1000);
+    if (delta) window.scrollBy(0, intent.direction * delta);
+    dragScrollFrame = window.requestAnimationFrame(runDragAutoScroll);
+  }
+
+  function stopDragAutoScroll() {
+    if (dragScrollFrame !== null) {
+      window.cancelAnimationFrame(dragScrollFrame);
+      dragScrollFrame = null;
+    }
+    dragPointerY = null;
+    dragScrollDirection = 0;
+    dragScrollStartedAt = 0;
+    dragScrollLastFrameAt = 0;
+  }
+
+  document.addEventListener("dragover", (event) => {
+    if (!draggedRow) return;
+    dragPointerY = event.clientY;
+    if (dragScrollFrame === null) {
+      dragScrollFrame = window.requestAnimationFrame(runDragAutoScroll);
     }
   });
 
@@ -2455,11 +2643,15 @@
   });
 
   listEl.addEventListener("drop", (event) => {
-    if (draggedRow) event.preventDefault();
+    if (draggedRow) {
+      event.preventDefault();
+      stopDragAutoScroll();
+    }
   });
 
   listEl.addEventListener("dragend", () => {
     if (!draggedRow) return;
+    stopDragAutoScroll();
     listEl.querySelectorAll(".row").forEach((row) => {
       row.style.transition = "";
       row.style.transform = "";
@@ -2545,7 +2737,7 @@
     );
     if (!confirmed) return;
     window.open(
-      "https://github.com/26434288-a11y/marku-fps-config-code-library/issues/new/choose",
+      "https://github.com/M0ch3n/marku-fps-config-code-library/issues/new/choose",
       "_blank",
       "noopener,noreferrer"
     );
@@ -2745,6 +2937,7 @@
   confirmOkBtn.addEventListener("click", () => closeConfirm(true));
 
   loadSettings();
+  state.filters.game = settings.activeGame;
   applyTheme({ animate: false });
   applyLanguage({ animate: false });
   setupI18nObserver();

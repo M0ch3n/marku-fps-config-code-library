@@ -1,0 +1,58 @@
+name: Bug 报告 / Bug report
+description: 报告可复现的问题 / Report a reproducible problem
+title: "[Bug] "
+body:
+  - type: markdown
+    attributes:
+      value: |
+        请尽量提供可复现步骤和运行环境。
+        Please include reproducible steps and environment details.
+
+  - type: input
+    id: version
+    attributes:
+      label: 版本 / Version
+      placeholder: v1.5.0
+    validations:
+      required: true
+
+  - type: textarea
+    id: description
+    attributes:
+      label: 问题描述 / Description
+      description: 简要说明发生了什么。 / Briefly describe what happened.
+    validations:
+      required: true
+
+  - type: textarea
+    id: steps
+    attributes:
+      label: 复现步骤 / Steps to reproduce
+      placeholder: |
+        1. 打开……
+        2. 点击……
+        3. 出现……
+    validations:
+      required: true
+
+  - type: textarea
+    id: expected
+    attributes:
+      label: 预期结果 / Expected behavior
+    validations:
+      required: true
+
+  - type: textarea
+    id: actual
+    attributes:
+      label: 实际结果 / Actual behavior
+    validations:
+      required: true
+
+  - type: textarea
+    id: environment
+    attributes:
+      label: 运行环境 / Environment
+      placeholder: Windows 11, Chrome 141, 1920x1080
+    validations:
+      required: false

@@ -219,8 +219,6 @@ function findMarkuHelper() {
   const candidates = [
     path.join(ROOT, '.build', 'Marku.exe'),
     path.join(ROOT, 'Marku.exe'),
-    path.join(ROOT, 'Marku-Browser.exe'),
-    path.join(ROOT, 'Marku-Desktop.exe'),
   ];
   return candidates.find((candidate) => fs.existsSync(candidate)) || '';
 }
@@ -658,6 +656,28 @@ async function readJson(req) {
 
 async function handleApi(req, res, pathname, url) {
   try {
+    if (req.method === 'GET' && pathname === '/api/health') {
+      if (!isLocalRequest(req)) {
+        return sendJson(res, 404, { error: '接口不存在' });
+      }
+      const requestedRoot = String(url.searchParams.get('root') || '');
+      let matches = false;
+      try {
+        matches =
+          requestedRoot !== '' &&
+          path.resolve(requestedRoot).toLowerCase() ===
+            path.resolve(ROOT).toLowerCase();
+      } catch {
+        matches = false;
+      }
+      return sendJson(res, 200, {
+        app: 'marku',
+        pid: process.pid,
+        root: ROOT,
+        match: matches,
+      });
+    }
+
     if (req.method === 'GET' && pathname === '/api/codes') {
       refreshCodesFromDisk();
       sendJson(res, 200, { items: sortCodes(codes) });
@@ -854,13 +874,10 @@ async function handleApi(req, res, pathname, url) {
       if (currentScopeCount && !overwrite) {
         return sendJson(res, 409, {
           error: '导入会覆盖当前范围内的数据，请确认后重试',
-          previousCount: currentScopeCount,
         });
       }
 
-      const previousCount = codes.length;
       const now = new Date().toISOString();
-      let added = imported.size;
       let settingsUpdated = false;
 
       if (scope !== 'arenaSettings') {
@@ -910,12 +927,8 @@ async function handleApi(req, res, pathname, url) {
       }
 
       sendJson(res, 200, {
-        added,
-        previousCount,
-        scope,
-        overwritten: previousCount > 0 && added > 0,
+        added: imported.size,
         settingsUpdated,
-        settings,
       });
       return;
     }
@@ -1017,7 +1030,7 @@ async function handleApi(req, res, pathname, url) {
   }
 }
 
-function serveStatic(req, res, pathname) {
+function serveStatic(res, pathname) {
   const rel = pathname === '/' ? 'index.html' : pathname.replace(/^\/+/, '');
   const filePath = path.resolve(PUBLIC_DIR, rel);
   const insidePublic =
@@ -1072,7 +1085,7 @@ const server = http.createServer((req, res) => {
     return;
   }
 
-  serveStatic(req, res, pathname);
+  serveStatic(res, pathname);
 });
 
 server.on('error', (err) => {

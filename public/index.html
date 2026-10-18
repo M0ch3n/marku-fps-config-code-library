@@ -6,7 +6,7 @@
   <meta name="robots" content="noindex, nofollow">
   <title>Marku</title>
   <link rel="icon" type="image/png" href="/assets/ak-icon.png?v=20261014-1">
-  <link rel="stylesheet" href="/styles.css?v=20261016-14">
+  <link rel="stylesheet" href="/styles.css?v=20261018-13">
 </head>
 <body>
   <header class="topbar">
@@ -38,98 +38,100 @@
   </header>
 
   <main class="container" id="mainContent">
-    <div class="view-head">
-      <div class="game-title-wrap">
-        <img class="game-logo" id="gameLogo" src="/assets/arena-breakout-icon.png?v=20261016-1" width="26" height="26" alt="暗区突围：无限" draggable="false">
-        <h1 class="view-title" id="gameTitle">暗区突围：无限</h1>
+    <div class="content-toolbar">
+      <div class="view-head">
+        <div class="game-title-wrap">
+          <img class="game-logo" id="gameLogo" src="/assets/arena-breakout-icon.png?v=20261016-1" width="26" height="26" alt="暗区突围：无限" draggable="false">
+          <h1 class="view-title" id="gameTitle">暗区突围：无限</h1>
+        </div>
+        <div class="view-actions">
+          <button class="icon-btn" id="announcementsBtn" type="button" data-tooltip="查看最新公告" aria-label="查看最新公告">
+            <svg viewBox="0 0 24 24" width="17" height="17" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+              <path d="M18 8a6 6 0 0 0-12 0c0 7-3 7-3 9h18c0-2-3-2-3-9"></path>
+              <path d="M10 21h4"></path>
+            </svg>
+          </button>
+          <button class="icon-btn" id="reorderBtn" type="button" data-tooltip="调整顺序" aria-label="调整顺序">
+            <svg viewBox="0 0 24 24" width="17" height="17" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+              <path d="m21 16-4 4-4-4M17 20V4M3 8l4-4 4 4M7 4v16"></path>
+            </svg>
+          </button>
+          <button class="icon-btn" id="addBtn" type="button" data-tooltip="新增" aria-label="新增">
+            <svg viewBox="0 0 24 24" width="17" height="17" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+              <path d="M12 5v14M5 12h14"></path>
+            </svg>
+          </button>
+        </div>
       </div>
-      <div class="view-actions">
-        <button class="icon-btn" id="announcementsBtn" type="button" data-tooltip="查看最新公告" aria-label="查看最新公告">
-          <svg viewBox="0 0 24 24" width="17" height="17" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
-            <path d="M18 8a6 6 0 0 0-12 0c0 7-3 7-3 9h18c0-2-3-2-3-9"></path>
-            <path d="M10 21h4"></path>
-          </svg>
-        </button>
-        <button class="icon-btn" id="reorderBtn" type="button" data-tooltip="调整顺序" aria-label="调整顺序">
-          <svg viewBox="0 0 24 24" width="17" height="17" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
-            <path d="m21 16-4 4-4-4M17 20V4M3 8l4-4 4 4M7 4v16"></path>
-          </svg>
-        </button>
-        <button class="icon-btn" id="addBtn" type="button" data-tooltip="新增" aria-label="新增">
-          <svg viewBox="0 0 24 24" width="17" height="17" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
-            <path d="M12 5v14M5 12h14"></path>
-          </svg>
-        </button>
-      </div>
-    </div>
 
-    <div class="search-row">
-      <div class="search-left">
-        <label class="search">
-          <svg viewBox="0 0 24 24" width="17" height="17" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
-            <circle cx="11" cy="11" r="7"></circle>
-            <path d="m21 21-4.3-4.3"></path>
-          </svg>
-          <span class="search-input-wrap">
-            <input id="searchInput" type="search" placeholder="搜索......" autocomplete="off">
-            <span class="search-mirror" id="searchMirror" aria-hidden="true"><span class="search-mirror-track" id="searchMirrorTrack"></span></span>
-            <button class="search-clear" id="searchClearBtn" type="button" data-tooltip="清空搜索" aria-label="清空搜索" hidden>
-              <svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
-                <path d="M18 6 6 18M6 6l12 12"></path>
+      <div class="search-row">
+        <div class="search-left">
+          <label class="search">
+            <svg viewBox="0 0 24 24" width="17" height="17" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+              <circle cx="11" cy="11" r="7"></circle>
+              <path d="m21 21-4.3-4.3"></path>
+            </svg>
+            <span class="search-input-wrap">
+              <input id="searchInput" type="search" placeholder="搜索......" autocomplete="off">
+              <span class="search-mirror" id="searchMirror" aria-hidden="true"><span class="search-mirror-track" id="searchMirrorTrack"></span></span>
+              <button class="search-clear" id="searchClearBtn" type="button" data-tooltip="清空搜索" aria-label="清空搜索" hidden>
+                <svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+                  <path d="M18 6 6 18M6 6l12 12"></path>
+                </svg>
+              </button>
+            </span>
+          </label>
+          <div class="dropdown" id="typeFilterDropdown" data-dropdown>
+            <input type="hidden" id="typeFilter" class="dropdown-value" value="">
+            <button class="dropdown-trigger" type="button" aria-haspopup="listbox" aria-expanded="false">
+              <span class="dropdown-label" data-placeholder="全部类型">全部类型</span>
+              <svg class="dropdown-arrow" viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+                <path d="m6 9 6 6 6-6"></path>
               </svg>
             </button>
-          </span>
-        </label>
-        <div class="dropdown" id="typeFilterDropdown" data-dropdown>
-          <input type="hidden" id="typeFilter" class="dropdown-value" value="">
-          <button class="dropdown-trigger" type="button" aria-haspopup="listbox" aria-expanded="false">
-            <span class="dropdown-label" data-placeholder="全部类型">全部类型</span>
-            <svg class="dropdown-arrow" viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
-              <path d="m6 9 6 6 6-6"></path>
+            <div class="dropdown-menu" role="listbox">
+              <button class="dropdown-option is-selected" type="button" role="option" data-value="" aria-selected="true">全部类型</button>
+              <button class="dropdown-option" type="button" role="option" data-value="改枪码" aria-selected="false">改枪码</button>
+              <button class="dropdown-option" type="button" role="option" data-value="配装码" aria-selected="false">配装码</button>
+            </div>
+          </div>
+          <div class="dropdown" id="deltaModeDropdown" data-dropdown hidden>
+            <input type="hidden" id="deltaModeFilter" class="dropdown-value" value="">
+            <button class="dropdown-trigger" type="button" aria-haspopup="listbox" aria-expanded="false">
+              <span class="dropdown-label" data-placeholder="全部类型">全部类型</span>
+              <svg class="dropdown-arrow" viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+                <path d="m6 9 6 6 6-6"></path>
+              </svg>
+            </button>
+            <div class="dropdown-menu" role="listbox">
+              <button class="dropdown-option is-selected" type="button" role="option" data-value="" aria-selected="true">全部类型</button>
+              <button class="dropdown-option" type="button" role="option" data-value="烽火地带改枪码" aria-selected="false">烽火地带改枪码</button>
+              <button class="dropdown-option" type="button" role="option" data-value="全面战场改枪码" aria-selected="false">全面战场改枪码</button>
+              <button class="dropdown-option" type="button" role="option" data-value="黑潮爆破改枪码" aria-selected="false">黑潮爆破改枪码</button>
+              <button class="dropdown-option" type="button" role="option" data-value="黑潮爆破配装码" aria-selected="false">黑潮爆破配装码</button>
+            </div>
+          </div>
+          <button class="icon-btn clear-filter-btn" id="clearFiltersBtn" type="button" data-tooltip="清空筛选" aria-label="清空筛选" disabled>
+            <svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+              <path d="M3 5h18M6 12h8M10 19h4"></path>
+              <path d="m17 14 4 4m0-4-4 4"></path>
             </svg>
           </button>
-          <div class="dropdown-menu" role="listbox">
-            <button class="dropdown-option is-selected" type="button" role="option" data-value="" aria-selected="true">全部类型</button>
-            <button class="dropdown-option" type="button" role="option" data-value="改枪码" aria-selected="false">改枪码</button>
-            <button class="dropdown-option" type="button" role="option" data-value="配装码" aria-selected="false">配装码</button>
-          </div>
         </div>
-        <div class="dropdown" id="deltaModeDropdown" data-dropdown hidden>
-          <input type="hidden" id="deltaModeFilter" class="dropdown-value" value="">
-          <button class="dropdown-trigger" type="button" aria-haspopup="listbox" aria-expanded="false">
-            <span class="dropdown-label" data-placeholder="全部类型">全部类型</span>
-            <svg class="dropdown-arrow" viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
-              <path d="m6 9 6 6 6-6"></path>
-            </svg>
-          </button>
-          <div class="dropdown-menu" role="listbox">
-            <button class="dropdown-option is-selected" type="button" role="option" data-value="" aria-selected="true">全部类型</button>
-            <button class="dropdown-option" type="button" role="option" data-value="烽火地带改枪码" aria-selected="false">烽火地带改枪码</button>
-            <button class="dropdown-option" type="button" role="option" data-value="全面战场改枪码" aria-selected="false">全面战场改枪码</button>
-            <button class="dropdown-option" type="button" role="option" data-value="黑潮爆破改枪码" aria-selected="false">黑潮爆破改枪码</button>
-            <button class="dropdown-option" type="button" role="option" data-value="黑潮爆破配装码" aria-selected="false">黑潮爆破配装码</button>
-          </div>
-        </div>
-        <button class="icon-btn clear-filter-btn" id="clearFiltersBtn" type="button" data-tooltip="清空筛选" aria-label="清空筛选" disabled>
-          <svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
-            <path d="M3 5h18M6 12h8M10 19h4"></path>
-            <path d="m17 14 4 4m0-4-4 4"></path>
+        <button class="icon-btn" id="settingsCodeBtn" type="button" data-tooltip="设置码" aria-label="设置码">
+          <svg viewBox="0 0 24 24" width="17" height="17" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+            <line x1="21" x2="14" y1="4" y2="4"></line>
+            <line x1="10" x2="3" y1="4" y2="4"></line>
+            <line x1="21" x2="12" y1="12" y2="12"></line>
+            <line x1="8" x2="3" y1="12" y2="12"></line>
+            <line x1="21" x2="16" y1="20" y2="20"></line>
+            <line x1="12" x2="3" y1="20" y2="20"></line>
+            <line x1="14" x2="14" y1="2" y2="6"></line>
+            <line x1="8" x2="8" y1="10" y2="14"></line>
+            <line x1="16" x2="16" y1="18" y2="22"></line>
           </svg>
         </button>
       </div>
-      <button class="icon-btn" id="settingsCodeBtn" type="button" data-tooltip="设置码" aria-label="设置码">
-        <svg viewBox="0 0 24 24" width="17" height="17" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
-          <line x1="21" x2="14" y1="4" y2="4"></line>
-          <line x1="10" x2="3" y1="4" y2="4"></line>
-          <line x1="21" x2="12" y1="12" y2="12"></line>
-          <line x1="8" x2="3" y1="12" y2="12"></line>
-          <line x1="21" x2="16" y1="20" y2="20"></line>
-          <line x1="12" x2="3" y1="20" y2="20"></line>
-          <line x1="14" x2="14" y1="2" y2="6"></line>
-          <line x1="8" x2="8" y1="10" y2="14"></line>
-          <line x1="16" x2="16" y1="18" y2="22"></line>
-        </svg>
-      </button>
     </div>
 
     <section id="list" class="list" aria-live="polite"></section>
@@ -453,6 +455,6 @@
   <script src="/vendor/pinyin-pro.min.js"></script>
   <script src="/import-parser.js?v=20261016-2" defer></script>
   <script src="/i18n.js?v=20261016-5" defer></script>
-  <script src="/app.js?v=20261016-16" defer></script>
+  <script src="/app.js?v=20261018-19" defer></script>
 </body>
 </html>

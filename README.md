@@ -7,6 +7,8 @@ A lightweight game configuration code manager for storing gun build codes, loado
 ## 功能 / Features
 
 - 暗区突围：无限、三角洲行动双游戏页签<br>Arena Breakout: Infinite and Delta Force dual game tabs
+- 记住最后停留的游戏页签<br>Remember the last selected game tab
+- 中英文界面切换，英文模式仅显示英文格式配置码且价格不带单位<br>Switch between Chinese and English, with English mode showing English-format codes and unitless prices
 - 改枪码、配装码管理<br>Gun build code and loadout code management
 - 暗区突围：无限设置码管理<br>Arena Breakout: Infinite settings code management
 - 按枪械描述搜索，支持拼音和拼音首字母<br>Search by weapon description, with pinyin and pinyin initial support
@@ -19,17 +21,13 @@ A lightweight game configuration code manager for storing gun build codes, loado
 - 数据保存在本地 JSON 文件<br>Data stored in local JSON files
 - 原生 HTML / CSS / JavaScript，无前端构建步骤<br>Native HTML / CSS / JavaScript with no frontend build step
 
-## 下载版本 / Downloads
+## 下载便携版 / Portable Download
 
-浏览器启动版：下载 `Marku-Code-Library-Browser.zip`，完整解压后双击 `Marku-Browser.exe`。
+普通用户请下载最新 Release 中的 `Marku-Code-Library.zip`。完整解压后双击 `Marku.exe` 即可运行。
 
-Browser launcher: download `Marku-Code-Library-Browser.zip`, extract it completely, then double-click `Marku-Browser.exe`.
+Regular users should download `Marku-Code-Library.zip` from the latest Release. Extract it completely, then double-click `Marku.exe` to run.
 
-独立桌面版：下载 `Marku-Code-Library-Desktop.zip`，完整解压后双击 `Marku-Desktop.exe`。
-
-Standalone desktop app: download `Marku-Code-Library-Desktop.zip`, extract it completely, then double-click `Marku-Desktop.exe`.
-
-[下载最新版本 / Download the latest version](https://github.com/26434288-a11y/marku-fps-config-code-library/releases/latest)
+[下载最新版本 / Download the latest version](https://github.com/M0ch3n/marku-fps-config-code-library/releases/latest)
 
 ## Windows 首次运行提示 / Windows First-Run Notice
 
@@ -92,7 +90,7 @@ Both files are listed in `.gitignore`, so personal configurations are not upload
 
 - [更新日志 / Changelog](CHANGELOG.md)
 - [常见问题 / FAQ](FAQ.md)
-- [反馈问题或建议 / Report an issue or suggestion](https://github.com/26434288-a11y/marku-fps-config-code-library/issues/new/choose)
+- [反馈问题或建议 / Report an issue or suggestion](https://github.com/M0ch3n/marku-fps-config-code-library/issues/new/choose)
 - [MIT License](LICENSE)
 
 ## 安全 / Security

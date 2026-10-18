@@ -53,7 +53,11 @@
     调整顺序: "Reorder",
     保存顺序: "Save Order",
     请先清空筛选: "Clear filters first",
+    请先完成排序: "Finish reordering first",
     新增: "Add",
+    暂无英文配置码: "No English configuration codes",
+    切换到中文模式可查看中文卡片:
+      "Switch to Chinese to view Chinese-mode cards",
     编辑: "Edit",
     删除: "Delete",
     复制: "Copy",
@@ -62,7 +66,6 @@
     详情: "Details",
     确认: "Confirm",
     确定: "Confirm",
-    取消: "Cancel",
     更多操作: "More Actions",
     拖拽排序: "Drag to reorder",
     "搜索......": "Search...",
@@ -131,8 +134,6 @@
     切换类型: "Change Type",
     清空并切换: "Clear and Switch",
     跳转提示: "Navigation Notice",
-    前往Github: "Go to GitHub",
-    "前往 Github": "Go to GitHub",
     "前往 GitHub": "Go to GitHub",
     "该操作将跳转到 GitHub 反馈页面，是否继续？":
       "This will open the GitHub feedback page. Continue?",
@@ -157,7 +158,6 @@
     "正在打开文件夹选择器...": "Opening the folder picker...",
     "data 文件夹备份完成": "data folder backup completed",
     已备份: "Backed up",
-    "备份 data 文件夹": "Back Up data Folder",
     "备份失败": "Backup failed",
     "读取备份数据失败": "Failed to read backup data",
     "浏览器不支持选择文件夹，已下载 JSON 格式备份":
@@ -170,13 +170,10 @@
     请先选择导入范围: "Select an import scope first",
     未找到该配置: "Configuration not found",
     未识别到三角洲行动改枪码: "No Delta Force Gun Build Code was found",
-    未识别到暗区突围配装改枪码:
-      "No Arena Breakout: Infinite Loadout/Gun Build Code was found",
     "未识别到暗区突围配装/改枪码":
       "No Arena Breakout: Infinite Loadout/Gun Build Code was found",
     未识别到暗区突围设置码:
       "No Arena Breakout: Infinite settings code was found",
-    未识别到可导入内容: "No importable content was found",
     "当前导入范围不允许包含暗区突围配置码":
       "Arena Breakout: Infinite configuration codes are not allowed in this import scope",
     "当前导入范围不允许包含暗区突围设置码":

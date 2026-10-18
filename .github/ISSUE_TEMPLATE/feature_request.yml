@@ -1,0 +1,25 @@
+name: 功能建议 / Feature request
+description: 提出新功能或体验改进建议 / Suggest a feature or UX improvement
+title: "[Feature] "
+body:
+  - type: textarea
+    id: problem
+    attributes:
+      label: 需要解决的问题 / Problem to solve
+      description: 请描述当前使用场景和痛点。 / Describe the current workflow and pain point.
+    validations:
+      required: true
+
+  - type: textarea
+    id: proposal
+    attributes:
+      label: 建议方案 / Proposed solution
+    validations:
+      required: true
+
+  - type: textarea
+    id: alternatives
+    attributes:
+      label: 备选方案 / Alternatives considered
+    validations:
+      required: false

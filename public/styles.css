@@ -28,6 +28,7 @@
     Arial, sans-serif;
   --mono: ui-monospace, SFMono-Regular, "SF Mono", Menlo, Consolas,
     "Liberation Mono", monospace;
+  --topbar-height: 56px;
   color-scheme: light;
 }
 
@@ -62,11 +63,34 @@
   box-sizing: border-box;
 }
 
-html.theme-transitioning *,
-html.theme-transitioning *::before,
-html.theme-transitioning *::after {
-  transition: background-color 0.45s ease, color 0.45s ease,
-    border-color 0.45s ease, box-shadow 0.45s ease !important;
+html.theme-transitioning body,
+html.theme-transitioning .topbar,
+html.theme-transitioning .content-toolbar,
+html.theme-transitioning .row,
+html.theme-transitioning .dialog,
+html.theme-transitioning .dropdown-trigger,
+html.theme-transitioning .dropdown-menu,
+html.theme-transitioning .row-action-menu,
+html.theme-transitioning .search,
+html.theme-transitioning .segmented,
+html.theme-transitioning .segment,
+html.theme-transitioning .btn,
+html.theme-transitioning .icon-btn,
+html.theme-transitioning .import-scope-option,
+html.theme-transitioning .announcement-item,
+html.theme-transitioning .code-box,
+html.theme-transitioning .field input,
+html.theme-transitioning .field select,
+html.theme-transitioning .field textarea,
+html.theme-transitioning .toast,
+html.theme-transitioning .copy-tip,
+html.theme-transitioning .action-tip {
+  transition: background-color 0.4s ease;
+}
+
+html.theme-transitioning .row {
+  transition: background-color 0.4s ease,
+    transform 0.45s cubic-bezier(0.2, 0.8, 0.2, 1);
 }
 
 strong {
@@ -118,7 +142,7 @@ button {
 .topbar-inner {
   max-width: 960px;
   margin: 0 auto;
-  height: 56px;
+  height: var(--topbar-height);
   padding: 0 16px;
   display: flex;
   align-items: center;
@@ -160,6 +184,19 @@ button {
   max-width: 960px;
   margin: 0 auto;
   padding: 16px;
+}
+
+.content-toolbar {
+  position: sticky;
+  top: calc(var(--topbar-height) + 1px);
+  z-index: 15;
+  margin: -16px -16px 0;
+  padding: 16px;
+  background: var(--bg);
+}
+
+.content-toolbar .search-row {
+  margin-bottom: 0;
 }
 
 @keyframes content-section-out {
@@ -616,18 +653,7 @@ button {
 .dropdown.is-open .dropdown-option {
   opacity: 1;
   transform: translateY(0);
-}
-
-.dropdown.is-open .dropdown-option:nth-child(1) {
-  transition-delay: 0.06s;
-}
-
-.dropdown.is-open .dropdown-option:nth-child(2) {
-  transition-delay: 0.12s;
-}
-
-.dropdown.is-open .dropdown-option:nth-child(3) {
-  transition-delay: 0.18s;
+  transition-delay: calc(var(--dropdown-option-index, 0) * 60ms);
 }
 
 .dropdown-option:hover {
@@ -667,11 +693,14 @@ button {
   display: flex;
   flex-direction: column;
   gap: 8px;
-  transition: padding-left 0.75s cubic-bezier(0.4, 0, 0.2, 1);
 }
 
 .list.is-reordering {
-  padding-left: 24px;
+  padding-left: 0;
+}
+
+.list.is-reordering .row {
+  padding-left: 36px;
 }
 
 @keyframes result-item-in {
@@ -751,7 +780,7 @@ button {
 
 .drag-handle {
   position: absolute;
-  left: -24px;
+  left: 10px;
   top: 50%;
   display: inline-flex;
   align-items: center;
@@ -846,12 +875,28 @@ button {
   align-items: center;
   gap: 4px;
   flex-shrink: 0;
+  max-width: 140px;
+  margin-left: 0;
+  opacity: 1;
+  visibility: visible;
+  transition: opacity 0.16s ease, max-width 0s linear 0s,
+    visibility 0s linear 0s;
 }
 
 .row-action-set {
   display: flex;
   align-items: center;
   gap: 4px;
+}
+
+.list.is-reordering .row-actions {
+  max-width: 0;
+  margin-left: -12px;
+  opacity: 0;
+  visibility: hidden;
+  pointer-events: none;
+  transition: opacity 0.16s ease, max-width 0s linear 0.16s,
+    visibility 0s linear 0.16s;
 }
 
 .row-actions .row-more-btn,
@@ -917,16 +962,6 @@ button {
 
 .btn:hover {
   background: var(--surface-hover);
-}
-
-.btn-danger {
-  background: var(--surface);
-  border-color: #fecaca;
-  color: var(--danger);
-}
-
-.btn-danger:hover {
-  background: var(--danger-soft);
 }
 
 .btn-danger-solid {
@@ -1154,10 +1189,6 @@ button {
   color: var(--muted);
 }
 
-.list.is-reordering .empty {
-  margin-left: -24px;
-}
-
 .empty strong {
   display: block;
   font-size: 15px;
@@ -1250,7 +1281,8 @@ button {
   .dropdown-arrow,
   .dropdown-menu,
   .dropdown-option,
-  .icon-btn.is-copied {
+  .icon-btn.is-copied,
+  .row-actions {
     transition: none;
     animation: none;
   }
@@ -1281,6 +1313,10 @@ button {
   }
 
   .import-radio-visual {
+    transition: none;
+  }
+
+  .import-scope-option {
     transition: none;
   }
 
@@ -1382,11 +1418,25 @@ button {
   background: var(--surface);
   color: var(--text);
   cursor: pointer;
-  transition: border-color 0.22s ease, box-shadow 0.22s ease;
+  transition: border-color 0.22s ease, box-shadow 0.22s ease,
+    transform 0.24s cubic-bezier(0.22, 1, 0.36, 1),
+    background-color 0.22s ease;
 }
 
 .import-scope-option:hover {
+  background: var(--surface-hover);
+  border-color: var(--border-strong);
   box-shadow: 0 8px 18px rgba(16, 24, 40, 0.12);
+  transform: translateY(-2px);
+}
+
+.import-scope-option:active {
+  box-shadow: 0 3px 8px rgba(16, 24, 40, 0.1);
+  transform: translateY(0) scale(0.998);
+}
+
+.import-scope-option:hover .import-radio-visual {
+  border-color: var(--text);
 }
 
 :root[data-theme="dark"] .import-scope-option:hover {
@@ -1762,11 +1812,15 @@ button {
 }
 
 .field-row.three {
-  grid-template-columns: minmax(0, 1fr) minmax(0, 1.4fr) minmax(0, 1fr);
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+}
+
+.field-row.three #typeField {
+  grid-column: 1 / -1;
 }
 
 .field-row.two {
-  grid-template-columns: minmax(0, 0.85fr) minmax(0, 1.15fr);
+  grid-template-columns: 1fr;
 }
 
 .field-row.single {
@@ -1958,7 +2012,6 @@ button {
   color: #0f1115;
 }
 
-:root[data-theme="dark"] .btn-danger,
 :root[data-theme="dark"] .form-error {
   border-color: #7f1d1d;
 }
@@ -2048,7 +2101,7 @@ button {
   --action-scale: 0.9;
   opacity: 0;
   pointer-events: none;
-  transform: translate(calc(-100% - var(--action-offset)), -50%)
+  transform: translate(-50%, var(--action-offset))
     scale(var(--action-scale));
   transition: opacity 0.3s ease,
     transform 0.5s cubic-bezier(0.22, 1, 0.36, 1);
@@ -2062,25 +2115,28 @@ button {
 .action-tip::after {
   content: "";
   position: absolute;
-  right: -5px;
-  top: 50%;
+  left: 50%;
+  top: -5px;
   width: 8px;
   height: 8px;
   background: var(--surface);
   border-top: 1px solid var(--border);
-  border-right: 1px solid var(--border);
-  transform: translateY(-50%) rotate(45deg);
+  border-left: 1px solid var(--border);
+  transform: translateX(-50%) rotate(45deg);
 }
 
 .action-tip.show {
-  --action-offset: 12px;
+  --action-offset: 10px;
   --action-scale: 1;
   opacity: 1;
 }
 
 @media (max-width: 480px) {
+  :root {
+    --topbar-height: 52px;
+  }
+
   .topbar-inner {
-    height: 52px;
     padding: 0 12px;
     gap: 8px;
   }
@@ -2127,6 +2183,11 @@ button {
     padding: 12px;
   }
 
+  .content-toolbar {
+    margin: -12px -12px 0;
+    padding: 12px;
+  }
+
   .view-head {
     gap: 8px;
   }
@@ -2169,16 +2230,12 @@ button {
     flex: 0 0 32px;
   }
 
-  .list.is-reordering {
-    padding-left: 20px;
-  }
-
   .drag-handle {
-    left: -20px;
+    left: 8px;
   }
 
-  .list.is-reordering .empty {
-    margin-left: -20px;
+  .list.is-reordering .row {
+    padding-left: 32px;
   }
 
   .search-row {
@@ -2211,6 +2268,10 @@ button {
 
   .row-actions {
     gap: 2px;
+  }
+
+  .list.is-reordering .row-actions {
+    margin-left: -8px;
   }
 
   .row-actions .icon-btn {

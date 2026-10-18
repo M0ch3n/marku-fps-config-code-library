@@ -4,6 +4,38 @@
 
 Important updates to this project are recorded in this file.
 
+## [1.5.0] - 2026-10-18
+
+### 新增 Added
+
+- 新增吸顶工具栏，游戏标题、搜索、筛选和操作按钮在滚动时保持可见<br>Added a sticky toolbar that keeps the game title, search, filters, and action buttons visible while scrolling
+- 新增游戏页签记忆，刷新或重新打开页面时恢复最后停留的页签<br>Added active game tab memory so the last selected tab is restored after reloading or reopening the page
+- 调整顺序模式新增上下边缘自动滚动，并根据距离和持续时间平滑调整速度<br>Added calibrated edge auto-scrolling in reorder mode with distance-based speed and time dampening
+- 新增 GitHub Bug 报告和功能建议模板<br>Added GitHub issue forms for bug reports and feature requests
+
+### 变更 Changed
+
+- 调整为浏览器单版本发布，统一使用 `Marku-Code-Library.zip` 和 `Marku.exe`<br>Changed distribution to a browser-only release using `Marku-Code-Library.zip` and `Marku.exe`
+- 英文模式仅显示英文格式配置码，中文模式保留全部配置码<br>English mode now shows English-format configuration codes only, while Chinese mode continues to show all codes
+- 英文模式不再显示价格单位，列表、详情、表单和 TXT 输出保持一致<br>Removed price units in English mode across cards, details, forms, and TXT output
+- 英文新增和编辑表单中，Type 独占一行，描述与价格排列在下一行<br>In English add and edit forms, Type now uses its own row with description and price below
+- 优化调整顺序模式，卡片外框保持稳定，拖拽手柄移入卡片内部<br>Improved reorder mode by keeping card geometry stable and moving drag handles inside the cards
+- 优化主题切换性能，仅对主要界面表面执行背景过渡<br>Improved theme-switch performance by limiting background transitions to primary UI surfaces
+- 统一仓库、Wiki、应用反馈和 Windows 提示中的 GitHub 地址与下载命名<br>Unified GitHub links and download naming across the repository, Wiki, in-app feedback, and Windows notice
+
+### 修复 Fixed
+
+- 修复切换语言后顶部游戏页签指示器位置和宽度未重新计算的问题<br>Fixed the active game tab indicator retaining stale dimensions after switching languages
+- 修复设置弹窗切换语言时背景列表同步重绘造成的瞬时布局错乱<br>Fixed transient layout glitches caused by background list rendering during language changes in Settings
+- 修复分类导入选项悬浮时只有阴影、缺少视觉位移的问题<br>Fixed import-scope options showing only a shadow instead of a clear hover lift
+- 修复新增黑潮选项未参与下拉菜单逐项渐入的问题<br>Fixed the new Black Tide options not participating in staggered dropdown animations
+- 修复调整顺序和保存顺序时整排卡片横向抖动的问题<br>Fixed horizontal card jitter when entering or leaving reorder mode
+- 修复“顺序已保存”提示位置不符合界面层级的问题<br>Fixed the "Order saved" confirmation tip appearing on the wrong side of the button
+
+### 下载 Downloads
+
+- [Marku v1.5.0](https://github.com/M0ch3n/marku-fps-config-code-library/releases/tag/v1.5.0)
+
 ## [1.4.0] - 2026-10-16
 
 ### 新增 Added
@@ -30,7 +62,7 @@ Important updates to this project are recorded in this file.
 
 ### 下载 Downloads
 
-- [Marku v1.4.0](https://github.com/26434288-a11y/marku-fps-config-code-library/releases/tag/v1.4.0)
+- [Marku v1.4.0](https://github.com/M0ch3n/marku-fps-config-code-library/releases/tag/v1.4.0)
 
 ## [1.3.0] - 2026-10-16
 
@@ -62,7 +94,7 @@ Important updates to this project are recorded in this file.
 
 ### 下载 Downloads
 
-- [Marku v1.3.0](https://github.com/26434288-a11y/marku-fps-config-code-library/releases/tag/v1.3.0)
+- [Marku v1.3.0](https://github.com/M0ch3n/marku-fps-config-code-library/releases/tag/v1.3.0)
 
 ## [1.2.0] - 2026-10-15
 
@@ -88,7 +120,7 @@ Important updates to this project are recorded in this file.
 
 ### 下载 Downloads
 
-- [Marku v1.2.0](https://github.com/26434288-a11y/marku-fps-config-code-library/releases/tag/v1.2.0)
+- [Marku v1.2.0](https://github.com/M0ch3n/marku-fps-config-code-library/releases/tag/v1.2.0)
 
 ## [1.1.2] - 2026-10-14
 
@@ -99,7 +131,7 @@ Important updates to this project are recorded in this file.
 
 ### 下载 Downloads
 
-- [Marku v1.1.2](https://github.com/26434288-a11y/marku-fps-config-code-library/releases/tag/v1.1.2)
+- [Marku v1.1.2](https://github.com/M0ch3n/marku-fps-config-code-library/releases/tag/v1.1.2)
 
 ## [1.1.1] - 2026-10-14
 
@@ -119,7 +151,7 @@ Important updates to this project are recorded in this file.
 
 ### 下载 Downloads
 
-- [Marku v1.1.1](https://github.com/26434288-a11y/marku-fps-config-code-library/releases/tag/v1.1.1)
+- [Marku v1.1.1](https://github.com/M0ch3n/marku-fps-config-code-library/releases/tag/v1.1.1)
 
 ## [1.1.0] - 2026-10-14
 
@@ -149,7 +181,7 @@ Important updates to this project are recorded in this file.
 
 ### 下载 Downloads
 
-- [Marku v1.1.0](https://github.com/26434288-a11y/marku-fps-config-code-library/releases/tag/v1.1.0)
+- [Marku v1.1.0](https://github.com/M0ch3n/marku-fps-config-code-library/releases/tag/v1.1.0)
 
 ## [1.0.0] - 2026-10-13
 
@@ -169,4 +201,4 @@ Important updates to this project are recorded in this file.
 
 ### 下载 Downloads
 
-- [Marku v1.0.0](https://github.com/26434288-a11y/marku-fps-config-code-library/releases/tag/v1.0.0)
+- [Marku v1.0.0](https://github.com/M0ch3n/marku-fps-config-code-library/releases/tag/v1.0.0)
