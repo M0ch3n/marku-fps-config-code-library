@@ -144,11 +144,11 @@ When "All configuration codes" is selected and the file is missing Arena Breakou
 
 The blank overwrite is performed only after user confirmation; canceling leaves all data unchanged.
 
-## 为什么英文模式看不到中文配置码？ / Why are Chinese configuration codes hidden in English mode?
+## 为什么切换语言后只能看到一种格式的配置码？ / Why can I only see codes in one format after switching languages?
 
-英文模式只显示 Marku 能识别为英文格式的配置码。切回中文模式后，可以查看中文格式卡片和英文格式卡片。
+Marku 会按当前界面语言筛选配置码：中文模式只显示中文格式配置码，英文模式只显示英文格式配置码。两种模式的显示规则相同。
 
-English mode shows only configuration codes that Marku recognizes as English-format codes. Switch back to Chinese mode to view both Chinese-format and English-format cards.
+Marku filters configuration codes by the current interface language. Chinese mode shows Chinese-format codes only, while English mode shows English-format codes only. The same rule applies in both directions.
 
 ## 换电脑怎么迁移？ / How do I migrate to a new computer?
 
@@ -176,6 +176,12 @@ If the current browser environment does not support directory selection, a compl
 替换程序文件时请保留原来的 `data` 文件夹，否则本地配置会被空模板替换。
 
 Keep the original `data` folder when replacing program files; otherwise your local configuration will be replaced by an empty template.
+
+## 如何重新显示首次使用提示？ / How do I show the first-run notice again?
+
+删除 `data/app-state.json`，或将其中的 `onboardingVersion` 改为空字符串，然后刷新 Marku 页面。`codes.json` 和 `settings.json` 不需要修改。
+
+Delete `data/app-state.json`, or set its `onboardingVersion` to an empty string, then refresh Marku. Do not modify `codes.json` or `settings.json`.
 
 ## 可以多人共用一份数据吗？ / Can multiple people share one data set?
 

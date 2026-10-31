@@ -51,6 +51,9 @@
   let dragScrollLastFrameAt = 0;
   let tabIndicatorReady = false;
   let formTypeValue = "";
+  let onboardingLanguageChoice = "";
+  let onboardingGameChoice = "";
+  let onboardingSaving = false;
   const animatedSegmentIndicators = new WeakSet();
 
   const $ = (selector) => document.querySelector(selector);
@@ -94,6 +97,14 @@
   const confirmTitle = $("#confirmTitle");
   const confirmMessage = $("#confirmMessage");
   const confirmOkBtn = $("#confirmOkBtn");
+  const onboardingDialog = $("#onboardingDialog");
+  const onboardingLanguageButtons = [
+    ...document.querySelectorAll("[data-language-choice]"),
+  ];
+  const onboardingGameButtons = [
+    ...document.querySelectorAll("[data-game-choice]"),
+  ];
+  const onboardingStartBtn = $("#onboardingStartBtn");
 
   const settingsBtn = $("#settingsBtn");
   const settingsDialog = $("#settingsDialog");
@@ -214,7 +225,22 @@
   }
 
   function isVisibleInCurrentLanguage(item) {
-    return settings.language !== "en" || getItemLanguage(item) === "en";
+    return getItemLanguage(item) === settings.language;
+  }
+
+  function normalizeSearchText(value) {
+    return String(value == null ? "" : value)
+      .normalize("NFKC")
+      .toLowerCase();
+  }
+
+  function matchesWeaponSearch(weapon, search) {
+    const normalizedWeapon = normalizeSearchText(weapon);
+    const normalizedSearch = normalizeSearchText(search);
+    if (settings.language === "en" || !window.pinyinPro) {
+      return normalizedWeapon.includes(normalizedSearch);
+    }
+    return Boolean(window.pinyinPro.match(weapon, normalizedSearch));
   }
 
   const DELTA_MODE_CLASS = {
@@ -583,6 +609,102 @@
     }
     if (!dialog.hasAttribute("tabindex")) dialog.tabIndex = -1;
     dialog.focus({ preventScroll: true });
+  }
+
+  async function checkAppOnboarding() {
+    try {
+      const response = await fetch("/api/app-state");
+      const data = await response.json().catch(() => ({}));
+      if (response.ok && data.needsOnboarding) {
+        resetOnboardingControls();
+        showDialog(onboardingDialog);
+      }
+    } catch {
+      // First-run state is optional and must not prevent startup.
+    }
+  }
+
+  function updateOnboardingControls() {
+    onboardingLanguageButtons.forEach((button) => {
+      const selected =
+        Boolean(onboardingLanguageChoice) &&
+        button.dataset.languageChoice === onboardingLanguageChoice;
+      button.classList.toggle("is-selected", selected);
+      button.setAttribute("aria-pressed", String(selected));
+      button.disabled = onboardingSaving;
+    });
+
+    const gameSelectionEnabled =
+      Boolean(onboardingLanguageChoice) && !onboardingSaving;
+    onboardingGameButtons.forEach((button) => {
+      const selected =
+        Boolean(onboardingGameChoice) &&
+        button.dataset.gameChoice === onboardingGameChoice;
+      button.classList.toggle("is-selected", selected);
+      button.setAttribute("aria-pressed", String(selected));
+      button.disabled = !gameSelectionEnabled;
+    });
+
+    onboardingStartBtn.disabled =
+      !onboardingLanguageChoice || !onboardingGameChoice || onboardingSaving;
+    onboardingStartBtn.textContent = onboardingSaving
+      ? t("正在保存")
+      : t("开始使用");
+  }
+
+  function resetOnboardingControls() {
+    onboardingLanguageChoice = "";
+    onboardingGameChoice = "";
+    onboardingSaving = false;
+    updateOnboardingControls();
+  }
+
+  function selectOnboardingLanguage(language) {
+    if (onboardingSaving) return;
+    onboardingLanguageChoice = language;
+    settings.language = language;
+    saveSettings();
+    applyLanguage({ animate: false });
+    updateOnboardingControls();
+  }
+
+  function selectOnboardingGame(gameMode) {
+    if (!onboardingLanguageChoice || onboardingSaving) return;
+    onboardingGameChoice = gameMode;
+    settings.gameMode = gameMode;
+    if (gameMode !== "all") settings.activeGame = gameMode;
+    saveSettings();
+    applyGameMode({ animate: false });
+    updateOnboardingControls();
+  }
+
+  async function completeAppOnboarding() {
+    if (
+      onboardingSaving ||
+      !onboardingLanguageChoice ||
+      !onboardingGameChoice
+    ) {
+      return;
+    }
+    onboardingSaving = true;
+    updateOnboardingControls();
+    try {
+      const response = await fetch("/api/app-state/onboarding-complete", {
+        method: "POST",
+      });
+      if (!response.ok) throw new Error();
+      state.pendingLanguageRender = false;
+      onboardingDialog.close();
+      applyLanguage({ animate: false });
+      applyGameMode({ animate: false });
+    } catch {
+      showToast("无法保存首次使用状态");
+    } finally {
+      if (onboardingDialog.open) {
+        onboardingSaving = false;
+        updateOnboardingControls();
+      }
+    }
   }
 
   function openImportDialog() {
@@ -1189,10 +1311,7 @@
       }
       if (search) {
         const weapon = item.weapon || "";
-        const matched = window.pinyinPro
-          ? window.pinyinPro.match(weapon, search)
-          : weapon.toLowerCase().includes(search);
-        if (!matched) return false;
+        if (!matchesWeaponSearch(weapon, search)) return false;
       }
       return true;
     });
@@ -1279,11 +1398,13 @@
     </article>`;
   }
 
-  function emptyHTML(languageHidden = false) {
+  function emptyHTML(showLanguageEmpty = false) {
     const hasFilter =
       state.filters.type || state.filters.mode || state.filters.search;
-    if (!hasFilter && languageHidden) {
-      return `<div class="empty"><strong>暂无英文配置码</strong>切换到中文模式可查看中文卡片</div>`;
+    if (!hasFilter && showLanguageEmpty) {
+      return settings.language === "en"
+        ? `<div class="empty"><strong>暂无英文配置码</strong>切换到中文模式可查看中文卡片</div>`
+        : `<div class="empty"><strong>暂无中文配置码</strong>切换到英文模式可查看英文卡片</div>`;
     }
     return `<div class="empty"><strong>${
       hasFilter ? "没有符合条件的配置" : "还没有配置"
@@ -1292,16 +1413,9 @@
 
   function render({ animateResults = false } = {}) {
     const items = getFiltered();
-    const languageHidden =
-      settings.language === "en" &&
-      state.codes.some(
-        (item) =>
-          item.game === state.filters.game &&
-          !isVisibleInCurrentLanguage(item)
-      );
     listEl.innerHTML = items.length
       ? items.map(rowHTML).join("")
-      : emptyHTML(languageHidden);
+      : emptyHTML(state.codes.length > 0);
     window.requestAnimationFrame(() => {
       listEl.classList.toggle("is-reordering", state.reorderMode);
     });
@@ -2935,6 +3049,20 @@
     closeConfirm(false);
   });
   confirmOkBtn.addEventListener("click", () => closeConfirm(true));
+  onboardingDialog.addEventListener("cancel", (event) => {
+    event.preventDefault();
+  });
+  onboardingLanguageButtons.forEach((button) => {
+    button.addEventListener("click", () => {
+      selectOnboardingLanguage(button.dataset.languageChoice);
+    });
+  });
+  onboardingGameButtons.forEach((button) => {
+    button.addEventListener("click", () => {
+      selectOnboardingGame(button.dataset.gameChoice);
+    });
+  });
+  onboardingStartBtn.addEventListener("click", completeAppOnboarding);
 
   loadSettings();
   state.filters.game = settings.activeGame;
@@ -2948,6 +3076,7 @@
   updateReorderButton();
   applyGameMode({ animate: false });
   loadCodes();
+  checkAppOnboarding();
   window.setInterval(pollDataChanges, 2000);
   document.addEventListener("visibilitychange", () => {
     if (!document.hidden) pollDataChanges();

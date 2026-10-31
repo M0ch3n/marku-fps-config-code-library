@@ -9,6 +9,7 @@ Important updates to this project are recorded in this file.
 ### 新增 Added
 
 - 新增吸顶工具栏，游戏标题、搜索、筛选和操作按钮在滚动时保持可见<br>Added a sticky toolbar that keeps the game title, search, filters, and action buttons visible while scrolling
+- 首次引导新增游戏偏好选择，可选择两款游戏或“我都玩”<br>Added game preference selection to onboarding, with either game or All Games available
 - 新增游戏页签记忆，刷新或重新打开页面时恢复最后停留的页签<br>Added active game tab memory so the last selected tab is restored after reloading or reopening the page
 - 调整顺序模式新增上下边缘自动滚动，并根据距离和持续时间平滑调整速度<br>Added calibrated edge auto-scrolling in reorder mode with distance-based speed and time dampening
 - 新增 GitHub Bug 报告和功能建议模板<br>Added GitHub issue forms for bug reports and feature requests
@@ -16,7 +17,8 @@ Important updates to this project are recorded in this file.
 ### 变更 Changed
 
 - 调整为浏览器单版本发布，统一使用 `Marku-Code-Library.zip` 和 `Marku.exe`<br>Changed distribution to a browser-only release using `Marku-Code-Library.zip` and `Marku.exe`
-- 英文模式仅显示英文格式配置码，中文模式保留全部配置码<br>English mode now shows English-format configuration codes only, while Chinese mode continues to show all codes
+- 中英文模式分别只显示与当前界面语言一致的配置码<br>Chinese and English modes now show only configuration codes matching the current interface language
+- 英文模式搜索改为普通文本匹配，不再启用拼音和拼音首字母搜索<br>English-mode search now uses plain text matching without Pinyin or Pinyin-initial support
 - 英文模式不再显示价格单位，列表、详情、表单和 TXT 输出保持一致<br>Removed price units in English mode across cards, details, forms, and TXT output
 - 英文新增和编辑表单中，Type 独占一行，描述与价格排列在下一行<br>In English add and edit forms, Type now uses its own row with description and price below
 - 优化调整顺序模式，卡片外框保持稳定，拖拽手柄移入卡片内部<br>Improved reorder mode by keeping card geometry stable and moving drag handles inside the cards

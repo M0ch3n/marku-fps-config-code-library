@@ -1235,6 +1235,121 @@ button {
   width: min(420px, calc(100vw - 32px));
 }
 
+.onboarding-dialog {
+  width: min(440px, calc(100vw - 32px));
+}
+
+.onboarding-panel {
+  padding: 30px 28px 24px;
+  text-align: center;
+}
+
+.onboarding-logo {
+  display: block;
+  width: 48px;
+  height: 48px;
+  margin: 0 auto 14px;
+  border-radius: 8px;
+}
+
+.onboarding-panel h2 {
+  margin: 0;
+  font-size: 20px;
+  font-weight: 600;
+}
+
+.onboarding-subtitle {
+  margin: 2px 0 18px;
+  color: var(--muted);
+  font-size: 13px;
+}
+
+.onboarding-language-label {
+  margin: 6px 0 8px;
+  color: var(--muted);
+  font-size: 13px;
+}
+
+.onboarding-game-section {
+  margin-top: 18px;
+  padding-top: 18px;
+  border-top: 1px solid var(--border);
+}
+
+.onboarding-game-label {
+  margin: 0 0 8px;
+  color: var(--muted);
+  font-size: 13px;
+}
+
+.onboarding-language-options {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 8px;
+}
+
+.onboarding-game-options {
+  display: grid;
+  gap: 8px;
+}
+
+.onboarding-language-btn,
+.onboarding-game-btn,
+.onboarding-start-btn {
+  width: 100%;
+  min-height: 42px;
+  justify-content: center;
+  font-weight: 500;
+}
+
+.onboarding-game-btn {
+  justify-content: flex-start;
+  padding-inline: 14px;
+  text-align: left;
+}
+
+.onboarding-game-btn img,
+.onboarding-game-btn svg {
+  flex: 0 0 20px;
+}
+
+.onboarding-game-btn img {
+  border-radius: 4px;
+  object-fit: contain;
+}
+
+.onboarding-language-btn:hover:not(:disabled),
+.onboarding-game-btn:hover:not(:disabled) {
+  border-color: var(--text);
+  background: var(--surface-hover);
+}
+
+.onboarding-language-btn.is-selected,
+.onboarding-game-btn.is-selected {
+  border-color: var(--text);
+  background: var(--surface-hover);
+  box-shadow: inset 0 0 0 1px var(--text);
+}
+
+.onboarding-game-btn:disabled,
+.onboarding-start-btn:disabled {
+  cursor: not-allowed;
+  opacity: 0.45;
+}
+
+.onboarding-start-btn {
+  margin-top: 12px;
+  border-color: var(--text);
+  background: var(--text);
+  color: var(--surface);
+}
+
+.onboarding-start-btn:hover:not(:disabled) {
+  border-color: var(--text);
+  background: var(--text);
+  opacity: 0.88;
+}
+
 .confirm-message {
   margin: 0;
   color: var(--text);

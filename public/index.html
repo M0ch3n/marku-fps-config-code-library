@@ -6,7 +6,7 @@
   <meta name="robots" content="noindex, nofollow">
   <title>Marku</title>
   <link rel="icon" type="image/png" href="/assets/ak-icon.png?v=20261014-1">
-  <link rel="stylesheet" href="/styles.css?v=20261018-13">
+  <link rel="stylesheet" href="/styles.css?v=20261018-18">
 </head>
 <body>
   <header class="topbar">
@@ -411,6 +411,40 @@
     </form>
   </dialog>
 
+  <dialog id="onboardingDialog" class="dialog onboarding-dialog">
+    <div class="onboarding-panel">
+      <img class="onboarding-logo" src="/assets/ak-icon.png" width="48" height="48" alt="">
+      <h2>欢迎使用 Marku</h2>
+      <p class="onboarding-subtitle">Welcome to Marku</p>
+      <p class="onboarding-language-label">选择语言 / Choose your language</p>
+      <div class="onboarding-language-options" id="onboardingLanguageOptions">
+        <button class="btn onboarding-language-btn" type="button" data-language-choice="zh-CN">中文</button>
+        <button class="btn onboarding-language-btn" type="button" data-language-choice="en">English</button>
+      </div>
+      <div class="onboarding-game-section">
+        <p class="onboarding-game-label">选择游戏 / Choose your game</p>
+        <div class="onboarding-game-options" id="onboardingGameOptions" role="group" aria-label="选择游戏">
+          <button class="btn onboarding-game-btn" type="button" data-game-choice="暗区突围" aria-pressed="false" disabled>
+            <img src="/assets/arena-breakout-icon.png?v=20261016-1" width="20" height="20" alt="">
+            <span>暗区突围：无限</span>
+          </button>
+          <button class="btn onboarding-game-btn" type="button" data-game-choice="三角洲行动" aria-pressed="false" disabled>
+            <img src="/assets/delta-force-icon.png?v=20261016-1" width="20" height="20" alt="">
+            <span>三角洲行动</span>
+          </button>
+          <button class="btn onboarding-game-btn" type="button" data-game-choice="all" aria-pressed="false" disabled>
+            <svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+              <path d="M6 11h4M8 9v4M15 12h.01M18 10h.01"></path>
+              <path d="M17.3 5H6.7a4 4 0 0 0-4 3.5l-1 8A3.5 3.5 0 0 0 5.2 20c1 0 1.9-.4 2.6-1.1L10 17h4l2.2 1.9c.7.7 1.6 1.1 2.6 1.1a3.5 3.5 0 0 0 3.5-3.5l-1-8A4 4 0 0 0 17.3 5Z"></path>
+            </svg>
+            <span>我都玩</span>
+          </button>
+        </div>
+        <button class="btn onboarding-start-btn" id="onboardingStartBtn" type="button" disabled>开始使用 / Get Started</button>
+      </div>
+    </div>
+  </dialog>
+
   <dialog id="confirmDialog" class="dialog confirm-dialog">
     <div class="dialog-header">
       <h2 id="confirmTitle">确认</h2>
@@ -454,7 +488,7 @@
 
   <script src="/vendor/pinyin-pro.min.js"></script>
   <script src="/import-parser.js?v=20261016-2" defer></script>
-  <script src="/i18n.js?v=20261016-5" defer></script>
-  <script src="/app.js?v=20261018-19" defer></script>
+  <script src="/i18n.js?v=20261018-7" defer></script>
+  <script src="/app.js?v=20261019-1" defer></script>
 </body>
 </html>

@@ -6,6 +6,7 @@ The website automatically creates the following files in this directory after it
 
 - `codes.json`
 - `settings.json`
+- `app-state.json`
 
 这两个文件保存个人配置码，已被 `.gitignore` 排除，不会上传到 GitHub。
 

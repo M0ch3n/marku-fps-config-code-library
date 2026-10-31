@@ -11,6 +11,7 @@ outputs/
 data/codes.json
 data/settings.json
 data/announcements-cache.json
+data/app-state.json
 
 .DS_Store
 Thumbs.db

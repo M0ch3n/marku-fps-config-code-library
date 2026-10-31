@@ -19,6 +19,9 @@
     主题切换: "Theme",
     白天: "Light",
     黑夜: "Dark",
+    "选择游戏 / Choose your game": "Choose your game",
+    开始使用: "Get Started",
+    正在保存: "Saving...",
     游戏选择: "Game Selection",
     我都玩: "All Games",
     预览当前配置码: "Preview Current Configuration Codes",
@@ -56,8 +59,11 @@
     请先完成排序: "Finish reordering first",
     新增: "Add",
     暂无英文配置码: "No English configuration codes",
+    暂无中文配置码: "No Chinese configuration codes",
     切换到中文模式可查看中文卡片:
-      "Switch to Chinese to view Chinese-mode cards",
+      "Switch to Chinese to view Chinese cards",
+    切换到英文模式可查看英文卡片:
+      "Switch to English to view English cards",
     编辑: "Edit",
     删除: "Delete",
     复制: "Copy",
@@ -162,6 +168,7 @@
     "读取备份数据失败": "Failed to read backup data",
     "浏览器不支持选择文件夹，已下载 JSON 格式备份":
       "Folder selection is not supported. A JSON backup was downloaded.",
+    无法保存首次使用状态: "Unable to save the first-run state",
 
     导入检查失败: "Import Check Failed",
     知道了: "OK",

@@ -8,10 +8,10 @@ A lightweight game configuration code manager for storing gun build codes, loado
 
 - 暗区突围：无限、三角洲行动双游戏页签<br>Arena Breakout: Infinite and Delta Force dual game tabs
 - 记住最后停留的游戏页签<br>Remember the last selected game tab
-- 中英文界面切换，英文模式仅显示英文格式配置码且价格不带单位<br>Switch between Chinese and English, with English mode showing English-format codes and unitless prices
+- 中英文界面切换，两种语言仅显示对应格式的配置码；英文模式价格不带单位<br>Switch between Chinese and English, with each mode showing only codes in the corresponding language and English prices shown without units
 - 改枪码、配装码管理<br>Gun build code and loadout code management
 - 暗区突围：无限设置码管理<br>Arena Breakout: Infinite settings code management
-- 按枪械描述搜索，支持拼音和拼音首字母<br>Search by weapon description, with pinyin and pinyin initial support
+- 按枪械描述搜索，中文模式支持拼音和拼音首字母<br>Search by weapon description, with pinyin and pinyin initials in Chinese mode
 - 类型筛选、卡片详情、复制反馈<br>Type filtering, card details, and copy feedback
 - 手动拖动调整顺序<br>Manual drag-and-drop reordering
 - 白天 / 黑夜主题<br>Light / dark theme

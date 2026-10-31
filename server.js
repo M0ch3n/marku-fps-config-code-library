@@ -14,6 +14,7 @@ const ROOT = __dirname;
 const PUBLIC_DIR = path.join(ROOT, 'public');
 const DATA_FILE = path.join(ROOT, 'data', 'codes.json');
 const SETTINGS_FILE = path.join(ROOT, 'data', 'settings.json');
+const APP_STATE_FILE = path.join(ROOT, 'data', 'app-state.json');
 const DATA_DIR = path.dirname(DATA_FILE);
 const ANNOUNCEMENT_CACHE_FILE = path.join(
   ROOT,
@@ -56,6 +57,7 @@ function gameLabel(game) {
 
 let codes = loadCodes();
 let settings = loadSettings();
+let appState = loadAppState();
 
 function loadCodes() {
   try {
@@ -93,6 +95,38 @@ function loadSettings() {
 function saveSettings() {
   fs.mkdirSync(path.dirname(SETTINGS_FILE), { recursive: true });
   fs.writeFileSync(SETTINGS_FILE, JSON.stringify(settings, null, 2) + '\n');
+}
+
+function loadAppState() {
+  try {
+    const raw = fs.readFileSync(APP_STATE_FILE, 'utf8');
+    const parsed = JSON.parse(raw);
+    return {
+      onboardingVersion: String(parsed.onboardingVersion || ''),
+      completedAt: parsed.completedAt || null,
+    };
+  } catch (err) {
+    if (err.code === 'ENOENT') {
+      return { onboardingVersion: '', completedAt: null };
+    }
+    throw err;
+  }
+}
+
+function saveAppState() {
+  fs.mkdirSync(path.dirname(APP_STATE_FILE), { recursive: true });
+  fs.writeFileSync(
+    APP_STATE_FILE,
+    JSON.stringify(appState, null, 2) + '\n'
+  );
+}
+
+function refreshAppStateFromDisk() {
+  try {
+    appState = loadAppState();
+  } catch (error) {
+    console.error('读取 app-state.json 失败:', error.message);
+  }
 }
 
 function refreshCodesFromDisk() {
@@ -675,6 +709,29 @@ async function handleApi(req, res, pathname, url) {
         pid: process.pid,
         root: ROOT,
         match: matches,
+      });
+    }
+
+    if (req.method === 'GET' && pathname === '/api/app-state') {
+      refreshAppStateFromDisk();
+      return sendJson(res, 200, {
+        item: appState,
+        needsOnboarding: appState.onboardingVersion !== '1',
+      });
+    }
+
+    if (
+      req.method === 'POST' &&
+      pathname === '/api/app-state/onboarding-complete'
+    ) {
+      appState = {
+        onboardingVersion: '1',
+        completedAt: new Date().toISOString(),
+      };
+      saveAppState();
+      return sendJson(res, 200, {
+        item: appState,
+        needsOnboarding: false,
       });
     }
 
