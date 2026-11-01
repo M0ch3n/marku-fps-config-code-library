@@ -1,0 +1,48 @@
+name: Publish GitHub Release
+
+on:
+  push:
+    branches:
+      - main
+
+permissions:
+  contents: write
+
+jobs:
+  publish:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Check out repository
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Publish latest tagged release
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          set -euo pipefail
+
+          tag="$(git tag --sort=-version:refname | head -n 1)"
+          if [ -z "$tag" ]; then
+            echo "No version tag found."
+            exit 0
+          fi
+
+          if gh release view "$tag" --repo "$GITHUB_REPOSITORY" >/dev/null 2>&1; then
+            echo "Release $tag already exists."
+            exit 0
+          fi
+
+          version="${tag#v}"
+          notes="$(awk -v start="## [$version]" 'index($0, start) == 1 { found = 1; next } found && /^## \[/ { exit } found { print }' CHANGELOG.md)"
+          if [ -z "$notes" ]; then
+            echo "No changelog section found for $tag." >&2
+            exit 1
+          fi
+
+          gh release create "$tag" \
+            --repo "$GITHUB_REPOSITORY" \
+            --title "Marku $tag" \
+            --notes "$notes" \
+            --latest
