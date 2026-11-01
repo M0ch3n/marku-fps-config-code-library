@@ -7,6 +7,7 @@ A lightweight game configuration code manager for storing gun build codes, loado
 ## 功能 / Features
 
 - 暗区突围：无限、三角洲行动双游戏页签<br>Arena Breakout: Infinite and Delta Force dual game tabs
+- 首次使用引导，可选择语言与游戏偏好<br>First-run onboarding with language and game preference selection
 - 记住最后停留的游戏页签<br>Remember the last selected game tab
 - 中英文界面切换，两种语言仅显示对应格式的配置码；英文模式价格不带单位<br>Switch between Chinese and English, with each mode showing only codes in the corresponding language and English prices shown without units
 - 改枪码、配装码管理<br>Gun build code and loadout code management
