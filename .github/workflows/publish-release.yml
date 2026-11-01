@@ -16,10 +16,10 @@ jobs:
         uses: actions/checkout@v4
         with:
           fetch-depth: 0
+          persist-credentials: false
 
-      - name: Publish latest tagged release
-        env:
-          GH_TOKEN: ${{ github.token }}
+      - name: Find latest version tags
+        id: version
         run: |
           set -euo pipefail
 
@@ -29,20 +29,79 @@ jobs:
             exit 0
           fi
 
-          if gh release view "$tag" --repo "$GITHUB_REPOSITORY" >/dev/null 2>&1; then
-            echo "Release $tag already exists."
-            exit 0
-          fi
-
-          version="${tag#v}"
-          notes="$(awk -v start="## [$version]" 'index($0, start) == 1 { found = 1; next } found && /^## \[/ { exit } found { print }' CHANGELOG.md)"
-          if [ -z "$notes" ]; then
-            echo "No changelog section found for $tag." >&2
+          previous_tag="$(git tag --sort=-version:refname | grep -vx "$tag" | head -n 1)"
+          if [ -z "$previous_tag" ]; then
+            echo "No previous version tag found."
             exit 1
           fi
 
-          gh release create "$tag" \
+          echo "tag=$tag" >> "$GITHUB_OUTPUT"
+          echo "version=${tag#v}" >> "$GITHUB_OUTPUT"
+          echo "previous_tag=$previous_tag" >> "$GITHUB_OUTPUT"
+
+      - name: Create release if missing
+        env:
+          GH_TOKEN: ${{ github.token }}
+          TAG: ${{ steps.version.outputs.tag }}
+          VERSION: ${{ steps.version.outputs.version }}
+        run: |
+          set -euo pipefail
+
+          if gh release view "$TAG" --repo "$GITHUB_REPOSITORY" >/dev/null 2>&1; then
+            echo "Release $TAG already exists."
+            exit 0
+          fi
+
+          notes="$(awk -v start="## [$VERSION]" 'index($0, start) == 1 { found = 1; next } found && /^## \[/ { exit } found { print }' CHANGELOG.md)"
+          if [ -z "$notes" ]; then
+            echo "No changelog section found for $TAG." >&2
+            exit 1
+          fi
+
+          gh release create "$TAG" \
             --repo "$GITHUB_REPOSITORY" \
-            --title "Marku $tag" \
+            --title "Marku $TAG" \
             --notes "$notes" \
             --latest
+
+      - name: Download previous portable package
+        env:
+          GH_TOKEN: ${{ github.token }}
+          PREVIOUS_TAG: ${{ steps.version.outputs.previous_tag }}
+        run: |
+          set -euo pipefail
+
+          mkdir -p portable-base portable-build
+          gh release download "$PREVIOUS_TAG" \
+            --repo "$GITHUB_REPOSITORY" \
+            --pattern Marku-Code-Library.zip \
+            --dir portable-base \
+            --clobber
+          unzip -q portable-base/Marku-Code-Library.zip -d portable-build
+
+      - name: Build updated portable package
+        run: |
+          set -euo pipefail
+
+          rm -rf portable-build/Marku/public
+          cp -R public portable-build/Marku/public
+          cp server.js README.md FAQ.md CHANGELOG.md LICENSE WINDOWS-SMARTSCREEN.txt portable-build/Marku/
+          cp data/README.md portable-build/Marku/data/README.md
+
+          rm -f Marku-Code-Library.zip
+          (
+            cd portable-build
+            zip -qr ../Marku-Code-Library.zip Marku
+          )
+          sha256sum Marku-Code-Library.zip
+
+      - name: Upload portable package
+        env:
+          GH_TOKEN: ${{ github.token }}
+          TAG: ${{ steps.version.outputs.tag }}
+        run: |
+          set -euo pipefail
+
+          gh release upload "$TAG" Marku-Code-Library.zip \
+            --repo "$GITHUB_REPOSITORY" \
+            --clobber
